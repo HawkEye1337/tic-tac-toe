@@ -47,7 +47,6 @@ const checkWinner = function () {
     }
   }
   //after checking switch players
-  game.switchPlayers();
 };
 
 const game = (() => {
@@ -93,9 +92,13 @@ const addMark = function (e) {
       //add a mark (X,O) on the cell if it's empty (board then HTML)
       game.board[clickedCellIndex] = game.currentPlayer.icon;
       clickedCell.textContent = game.board[clickedCellIndex];
-      updateCurrentPlayer();
     }
     checkWinner();
+    if (playing) {
+      //Winner starts next round
+      game.switchPlayers();
+      updateCurrentPlayer();
+    }
   }
 };
 
