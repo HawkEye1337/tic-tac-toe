@@ -1,6 +1,9 @@
 "use strict";
+
 const status = document.querySelector(".game--status");
 let playing = true;
+
+//create players (with readonly properties)
 const Player = (name, icon) => {
   return {
     get name() {
@@ -23,25 +26,27 @@ const winningConditions = [
   [2, 4, 6],
 ];
 
-//cell X,O
-//index 0,1,2,3
 const checkWinner = function () {
   for (let i = 0; i < winningConditions.length; i++) {
     const winCondition = winningConditions[i]; //row by row
-    let a = game.board[winCondition[0]];
+    let a = game.board[winCondition[0]]; //winning conditions 1st column
     let b = game.board[winCondition[1]];
     let c = game.board[winCondition[2]];
+    //check if any spot from the winning conditions is empty that means no-one won yet
     if (a === "" || b === "" || c === "") {
       continue;
     }
+    //check if any 3 spots are identical
     if (a === b && b === c) {
       status.textContent = `${game.currentPlayer.name} won`;
       playing = false;
-    } else if (!game.board.includes("")) {
+    } //check for a draw (only happens if there's no empty spots on the board and the first condition is false)
+    else if (!game.board.includes("")) {
       status.textContent = `Draw`;
       playing = false;
     }
   }
+  //after checking switch players
   game.switchPlayers();
 };
 
@@ -80,36 +85,31 @@ updateCurrentPlayer();
 //add a mark on board click
 const addMark = function (e) {
   if (playing) {
-    console.log(e.target.getAttribute("data-cell"));
     const clickedCell = e.target;
+    //save the index of the clicked cell (from HTML attributes)
     const clickedCellIndex = +clickedCell.getAttribute("data-cell");
-    // game.board.forEach((cell, index) => {
-    //   document.querySelector(`[data-cell="${index}"]`).textContent = cell;
-    // });
+    //check if the clicked cell is empty to avoid multiple entries
     if (game.board[clickedCellIndex] === "") {
+      //add a mark (X,O) on the cell if it's empty (board then HTML)
       game.board[clickedCellIndex] = game.currentPlayer.icon;
       clickedCell.textContent = game.board[clickedCellIndex];
-
       updateCurrentPlayer();
     }
-
-    console.log(game.board);
     checkWinner();
   }
 };
 
-//add X or O
+//add X or O when empty cells are clicked
 document.querySelector(".game--container").addEventListener("click", addMark);
 //restart the game
 document.querySelector(".game--restart").addEventListener("click", (e) => {
-  console.log("working");
-  console.log(game);
   playing = true;
+  //clear the board in JS
   game.reset();
+  //clear the board in HTML
   game.board.forEach((cell, index) => {
     document.querySelector(`[data-cell="${index}"]`).textContent = cell;
   });
 
   status.textContent = `Current Player: ${game.currentPlayer.name}`;
-  console.log(game.board);
 });
